@@ -3,7 +3,7 @@
 #
 
 SRC = '97things.pdf'
-LEVEL = '0%,90%,0.4'
+LEVEL = '0%,100%'
 TOP = 10
 BOTTOM = 110
 LEFT = 10
@@ -34,11 +34,11 @@ pngs = image_list( PNG_DIR, 'png', pages )
 task :default => :pdf
 
 desc 'generate pdf file by concat all png files.'
-task :pdf => [:metadata, :png] do
+task :pdf => [PDF_DIR, :metadata] + pngs do
 	pdf_list = []
 	i = 0
 	src_pngs = pngs[i, 50]
-	while s do
+	while src_pngs do
 		pdf_list << "#{PDF_DIR}/#{i}.pdf"
 		sh "convert #{src_pngs.join ' '} -compress JPEG -quality 0 #{pdf_list[-1]}"
 		src_pngs = pngs[i += 50, 50]
@@ -55,7 +55,7 @@ file 'metadata.txt' => SRC do |t|
 end
 
 desc 'crop pgm files to png files.'
-task :png => [PNG_DIR] + pngs
+file :png => [PNG_DIR, :pgm] + pngs
 
 rule '.png' => '.pgm' do |t|
 	sh "convert #{t.prerequisites[0]} -level '#{LEVEL}' \
@@ -65,9 +65,7 @@ rule '.png' => '.pgm' do |t|
 end
 
 desc 'extract image files from source pdf.'
-task :pgm => [PGM_DIR] + pgms
-
-file pgms => SRC do
+file :pgm => [PGM_DIR, SRC] + pgms do
 	sh "pdftoppm -gray #{SRC} #{PGM_DIR}/tmp"
 end
 
