@@ -4,10 +4,12 @@
 
 SRC = '97things.pdf'
 LEVEL = '0%,100%'
-TOP = 10
-BOTTOM = 110
-LEFT = 10
-RIGHT = 10
+TOP = 100
+BOTTOM = 220
+LEFT = 100
+RIGHT = 100
+SIZE = '723' # for large books reading landscape style
+# SIZE = 'x735' # for small books reading portrait style
 
 PGM_DIR = './pgm'; directory PGM_DIR
 JPG_DIR = './jpg'; directory JPG_DIR
@@ -31,7 +33,7 @@ def pgm2jpg( pgm, jpg )
 	sh "convert #{pgm} -level '#{LEVEL}' \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
-		-gravity NorthWest -fuzz 50% -trim -quality 0 #{jpg}"
+		-gravity NorthWest -fuzz 50% -trim -quality 0 -resize #{SIZE} #{jpg}"
 end
 
 pages = count_pages
@@ -45,7 +47,7 @@ jpgs.each_with_index do |jpg, i|
 
 	file pgms[i] => [PGM_DIR, SRC] do
 		unless File::exist?( pgms[-1] ) then
-			sh "pdftoppm -gray #{SRC} #{PGM_DIR}/tmp"
+			sh "pdftoppm -r 300 -gray #{SRC} #{PGM_DIR}/tmp"
 		end
 	end
 end
@@ -83,9 +85,7 @@ rule '.jpg' => '.pgm' do |t|
 end
 
 desc 'extract image files from source pdf.'
-task :pgm => [PGM_DIR, SRC] + pgms do
-	sh "pdftoppm -gray #{SRC} #{PGM_DIR}/tmp"
-end
+task :pgm => [PGM_DIR, SRC] + pgms
 
 desc 'cleanap pgm images.'
 task 'clean-pgm' do
