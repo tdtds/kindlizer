@@ -8,7 +8,7 @@ TOP = 100
 BOTTOM = 220
 LEFT = 100
 RIGHT = 100
-SIZE = '723' # for large books reading landscape style
+SIZE = '722' # for large books reading landscape style
 # SIZE = 'x735' # for small books reading portrait style
 
 PGM_DIR = './pgm'; directory PGM_DIR
