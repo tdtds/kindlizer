@@ -55,7 +55,7 @@ def pgm2jpg( pgm, jpg )
 	sh "convert #{pgm} -level '#{LEVEL}' \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
-		-gravity NorthWest -fuzz 50% -trim -quality 0 -resize #{SIZE} #{jpg}"
+		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE} #{jpg}"
 end
 
 pages = count_pages
@@ -85,7 +85,7 @@ file DST => [PDF_DIR, 'metadata.txt'] + JPGS do
 	src_jpgs = JPGS[i, 50]
 	while src_jpgs do
 		pdf_list << "#{PDF_DIR}/#{i}.pdf"
-		sh "convert #{src_jpgs.join ' '} #{pdf_list[-1]}"
+		sh "convert #{src_jpgs.join ' '} -quality 50 #{pdf_list[-1]}"
 		src_jpgs = JPGS[i += 50, 50]
 	end
 	sh "pdftk #{pdf_list.join ' '} cat output #{PDF_DIR}/#{DST}"
