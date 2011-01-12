@@ -123,11 +123,13 @@ end
 desc 'cleanap all tmp files.'
 task :clean => ['clean-jpg', 'clean-pgm', 'clean-pdf'] do
 	rm 'metadata.txt'
+	rm [HTML, OPF]
 	rmdir PGM_DIR
 	rmdir JPG_DIR
 	rmdir PDF_DIR
 end
 
+desc 'generate MOBI file.'
 task :mobi => [OPF, HTML] + JPGS do |t|
 	sh "kindlegen #{OPF} -unicode -o #{MOBI}"
 end
@@ -150,8 +152,7 @@ rule '.opf' => '.pdf' do |t|
 			</x-metadata>
 		</metadata>
 		<manifest>
-			<item id="contents" media-type="text/x-oeb1-document" href="#{HTML}"></item>
-			<item id="toc" media-type="application/x-dtbncx+xml" href="toc.ncx"></item>
+			<item id="contents" media-type="text/html" href="#{HTML}"></item>
 		</manifest>
 		<spine>
 			<itemref idref="contents" />
@@ -173,8 +174,8 @@ rule '.html' => '.pdf' do |t|
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>#{book_title}</title>
 	</head>
-	<body>
-		#{JPGS.map{|j| %Q|<img src="#{j}" />|}.join "<mbp:pagebreak />\n\t\t"}
+	<body style="text-align: right;">
+		#{JPGS.map{|j| %Q|<img style="height: 100%;" src="#{j}" />|}.join "<mbp:pagebreak />\n\t\t"}
 	</body>
 	</html>
 	HTML
