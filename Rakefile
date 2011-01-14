@@ -23,7 +23,7 @@ LEVEL = '0%,100%'
 #---------------------------------------------------------
 
 PGM_DIR = './pgm'; directory PGM_DIR
-JPG_DIR = './jpg'; directory JPG_DIR
+PNG_DIR = './png'; directory PNG_DIR
 PDF_DIR = './pdf'; directory PDF_DIR
 
 DST = SRC.sub( /\.pdf$/, '.out.pdf' )
@@ -51,20 +51,20 @@ def image_list( dir, ext, count )
 	end
 end
 
-def pgm2jpg( pgm, jpg )
+def pgm2png( pgm, png )
 	sh "convert #{pgm} -level '#{LEVEL}' \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
-		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE} #{jpg}"
+		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE} #{png}"
 end
 
 pages = count_pages
 PGMS = image_list( PGM_DIR, 'pgm', pages )
-JPGS = image_list( JPG_DIR, 'jpg', pages )
+PNGS = image_list( PNG_DIR, 'png', pages )
 
-JPGS.each_with_index do |jpg, i|
-	file JPGS[i] => [JPG_DIR, PGMS[i]] do |t|
-		pgm2jpg( t.prerequisites[1], t.name )
+PNGS.each_with_index do |png, i|
+	file PNGS[i] => [PNG_DIR, PGMS[i]] do |t|
+		pgm2png( t.prerequisites[1], t.name )
 	end
 
 	file PGMS[i] => [PGM_DIR, SRC] do
@@ -76,17 +76,17 @@ end
 
 task :default => :pdf
 
-desc 'generate pdf file by concat all jpg files.'
+desc 'generate pdf file by concat all png files.'
 task :pdf => DST
 
-file DST => [PDF_DIR, 'metadata.txt'] + JPGS do
+file DST => [PDF_DIR, 'metadata.txt'] + PNGS do
 	pdf_list = []
 	i = 0
-	src_jpgs = JPGS[i, 50]
-	while src_jpgs do
+	src_pngs = PNGS[i, 50]
+	while src_pngs do
 		pdf_list << "#{PDF_DIR}/#{i}.pdf"
-		sh "convert #{src_jpgs.join ' '} -quality 50 #{pdf_list[-1]}"
-		src_jpgs = JPGS[i += 50, 50]
+		sh "convert #{src_pngs.join ' '} -quality 50 #{pdf_list[-1]}"
+		src_pngs = PNGS[i += 50, 50]
 	end
 	sh "pdftk #{pdf_list.join ' '} cat output #{PDF_DIR}/#{DST}"
 	sh "pdftk #{PDF_DIR}/#{DST} update_info metadata.txt output #{DST}" 
@@ -99,11 +99,11 @@ file 'metadata.txt' => SRC do |t|
 	sh "pdftk #{t.prerequisites.join ' '} dump_data output ./#{t.name}"
 end
 
-desc 'crop pgm files to jpg files.'
-task :jpg => [JPG_DIR] + JPGS
+desc 'crop pgm files to png files.'
+task :png => [PNG_DIR] + PNGS
 
-rule '.jpg' => '.pgm' do |t|
-	pgm2jpg( t.prerequisites[0], t.name )
+rule '.png' => '.pgm' do |t|
+	pgm2png( t.prerequisites[0], t.name )
 end
 
 desc 'extract image files from source pdf.'
@@ -117,10 +117,10 @@ task 'clean-pgm' do
 	end
 end
 
-desc 'cleanap jpg images.'
-task 'clean-jpg' do
+desc 'cleanap png images.'
+task 'clean-png' do
 	begin
-		rm JPGS
+		rm PNGS
 	rescue
 	end
 end
@@ -131,16 +131,16 @@ task 'clean-pdf' do
 end
 
 desc 'cleanap all tmp files.'
-task :clean => ['clean-jpg', 'clean-pgm', 'clean-pdf'] do
+task :clean => ['clean-png', 'clean-pgm', 'clean-pdf'] do
 	rm 'metadata.txt'
 	rm [HTML, OPF]
 	rmdir PGM_DIR
-	rmdir JPG_DIR
+	rmdir PNG_DIR
 	rmdir PDF_DIR
 end
 
 desc 'generate MOBI file.'
-task :mobi => [OPF, HTML] + JPGS do |t|
+task :mobi => [OPF, HTML] + PNGS do |t|
 	sh "kindlegen #{OPF} -unicode -o #{MOBI}"
 end
 
@@ -158,7 +158,7 @@ rule '.opf' => '.pdf' do |t|
 			</dc-metadata>
 			<x-metadata>
 			  <output encoding="utf-8" content-type="text/x-oeb1-document"></output>
-			  <EmbeddedCover>#{JPGS[0]}</EmbeddedCover>
+			  <EmbeddedCover>#{PNGS[0]}</EmbeddedCover>
 			</x-metadata>
 		</metadata>
 		<manifest>
@@ -185,7 +185,7 @@ rule '.html' => '.pdf' do |t|
 		<title>#{book_title}</title>
 	</head>
 	<body style="text-align: right;">
-		#{JPGS.map{|j| %Q|<img style="height: 100%;" src="#{j}" />|}.join "<mbp:pagebreak />\n\t\t"}
+		#{PNGS.map{|j| %Q|<img style="height: 100%;" src="#{j}" />|}.join "<mbp:pagebreak />\n\t\t"}
 	</body>
 	</html>
 	HTML
