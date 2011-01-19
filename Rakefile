@@ -7,6 +7,9 @@
 #   SIZE: adjust image size by destination format.
 #   LEVEL (optional): level option of ImageMagic.
 #
+# for Debian or Ubuntu user, needs packages below:
+#   ppler-utils poppler-data imagemagick pdftk
+#
 
 SRC = 'erdmann.pdf'
 TOP = 110
