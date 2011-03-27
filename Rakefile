@@ -8,17 +8,17 @@
 #   LEVEL (optional): level option of ImageMagic.
 #
 # for Debian or Ubuntu user, needs packages below:
-#   ppler-utils poppler-data imagemagick pdftk
+#   ppler-utils poppler-data imagemagick pdftk sam2p
 #
 
-SRC = 'erdmann.pdf'
-TOP = 110
+SRC = 'sample.pdf'
+TOP = 250
 BOTTOM = 100
 LEFT = 50
 RIGHT = 50
 
-SIZE = 'x735' # for small books reading portrait style
-# SIZE = '722' # for large books reading landscape style
+# SIZE = 'x735' # for small books reading portrait style
+SIZE = '720' # for large books reading landscape style
 # SIZE = 'x693' # for generating mobi, portrait style only
 
 LEVEL = '0%,100%'
@@ -63,11 +63,20 @@ def pgm2png( pgm, png )
 		#{png}"
 end
 
+def png2pdf( png, pdf )
+	sh "sam2p #{png} #{pdf}"
+end
+
 pages = count_pages
 PGMS = image_list( PGM_DIR, 'pgm', pages )
 PNGS = image_list( PNG_DIR, 'png', pages )
+PDFS = image_list( PDF_DIR, 'pdf', pages )
 
 PNGS.each_with_index do |png, i|
+	file PDFS[i] => [PDF_DIR, PNGS[i]] do |t|
+		png2pdf( t.prerequisites[1], t.name )
+	end
+
 	file PNGS[i] => [PNG_DIR, PGMS[i]] do |t|
 		pgm2png( t.prerequisites[1], t.name )
 	end
@@ -84,16 +93,8 @@ task :default => :pdf
 desc 'generate pdf file by concat all png files.'
 task :pdf => DST
 
-file DST => [PDF_DIR, 'metadata.txt'] + PNGS do
-	pdf_list = []
-	i = 0
-	src_pngs = PNGS[i, 50]
-	while src_pngs do
-		pdf_list << "#{PDF_DIR}/#{i}.pdf"
-		sh "convert #{src_pngs.join ' '} -quality 50 #{pdf_list[-1]}"
-		src_pngs = PNGS[i += 50, 50]
-	end
-	sh "pdftk #{pdf_list.join ' '} cat output #{PDF_DIR}/#{DST}"
+file DST => [PDF_DIR, 'metadata.txt'] + PDFS do
+	sh "pdftk #{PDFS.join ' '} cat output #{PDF_DIR}/#{DST}"
 	sh "pdftk #{PDF_DIR}/#{DST} update_info metadata.txt output #{DST}" 
 end
 
