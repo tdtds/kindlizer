@@ -58,7 +58,9 @@ def pgm2png( pgm, png )
 	sh "convert #{pgm} -level '#{LEVEL}' \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
-		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE} #{png}"
+		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE}\
+		#{/^x/ =~ SIZE ? '' : '-gravity SouthWest -splice 1x15 -gravity NorthEast -splice 1x15'}\
+		#{png}"
 end
 
 pages = count_pages
