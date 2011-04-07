@@ -8,7 +8,7 @@
 #   LEVEL (optional): level option of ImageMagic.
 #
 # for Debian or Ubuntu user, needs packages below:
-#   ppler-utils poppler-data imagemagick pdftk sam2p
+#   poppler-utils poppler-data imagemagick pdftk sam2p
 #
 
 SRC = 'sample.pdf'
