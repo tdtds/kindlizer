@@ -64,7 +64,7 @@ def pgm2png( pgm, png )
 end
 
 def png2pdf( png, pdf )
-	sh "sam2p #{png} #{pdf}"
+	sh "sam2p -j:quiet #{png} #{pdf}"
 end
 
 pages = count_pages
