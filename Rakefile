@@ -17,7 +17,7 @@ BOTTOM = 100
 LEFT = 50
 RIGHT = 50
 
-# SIZE = 'x735' # for small books reading portrait style
+# SIZE = '560x735' # for small books reading portrait style
 SIZE = '720' # for large books reading landscape style
 # SIZE = 'x693' # for generating mobi, portrait style only
 
@@ -59,7 +59,7 @@ def pgm2png( pgm, png )
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
 		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE}\
-		#{/^x/ =~ SIZE ? '' : '-gravity SouthWest -splice 1x15 -gravity NorthEast -splice 1x15'}\
+		#{/x/ =~ SIZE ? '' : '-gravity SouthWest -splice 1x15 -gravity NorthEast -splice 1x15'}\
 		#{png}"
 end
 
