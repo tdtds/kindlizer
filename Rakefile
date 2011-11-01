@@ -1,5 +1,5 @@
 #
-# Rakefile for self publishing ebook of Kindle3 made by scanning paper book.
+# Rakefile for self publishing ebook of Kindle made by scanning paper book.
 #
 # modify parameters by your environment:
 #   SRC (must): source PDF file name.
