@@ -42,3 +42,9 @@ Rakeコマンドに指定できるタスクは以下です:
 最終的に、SRC.out.pdfというファイルができます。Kindleに転送してお読み下さい。
 ファイル名が書名になります。また、metadata.txtのAuthorを英数字で書き換えると、
 Kindle上に著者名が(英語で)表示されます。
+
+【参考】
+@kamosawaさんが詳細な解説ドキュメントを書いてくださっています。
+
+   kindlizerの使い方
+   http://d.hatena.ne.jp/kamosawa/20111116
