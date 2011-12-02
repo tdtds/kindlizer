@@ -147,7 +147,7 @@ end
 
 desc 'generate MOBI file.'
 task :mobi => [OPF, HTML] + PNGS do |t|
-	sh "kindlegen #{OPF} -unicode -o #{MOBI}"
+	sh "kindlegen #{OPF} -o #{MOBI}"
 end
 
 rule '.opf' => '.pdf' do |t|
