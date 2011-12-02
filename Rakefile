@@ -17,9 +17,9 @@ BOTTOM = 100
 LEFT = 50
 RIGHT = 50
 
-# SIZE = '560x735' # for small books reading portrait style
-SIZE = '720' # for large books reading landscape style
-# SIZE = 'x693' # for generating mobi, portrait style only
+SIZE = '560x735' # for small books reading portrait style
+#SIZE = '720' # for large books reading landscape style
+#SIZE = 'x693' # for generating mobi, portrait style only
 
 LEVEL = '0%,100%'
 
