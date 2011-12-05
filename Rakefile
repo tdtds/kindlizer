@@ -22,10 +22,11 @@ SIZE = '560x735' # for small books reading portrait style
 #SIZE = 'x693' # for generating mobi, portrait style only
 
 LEVEL = '0%,100%'
+#LEVEL = '0%,80%,0.2' # for grayscale or fullcolor origin.
 
 #---------------------------------------------------------
 
-PGM_DIR = './pgm'; directory PGM_DIR
+PPM_DIR = './ppm'; directory PPM_DIR
 PNG_DIR = './png'; directory PNG_DIR
 PDF_DIR = './pdf'; directory PDF_DIR
 
@@ -48,14 +49,14 @@ end
 
 def image_list( dir, ext, count )
 	[].tap do |l|
-		1.upto( count ) do |i|
+		0.upto( count - 1 ) do |i|
 			l << "#{dir}/tmp-#{'%03d' % i}.#{ext}"
 		end
 	end
 end
 
-def pgm2png( pgm, png )
-	sh "convert #{pgm} -level '#{LEVEL}' \
+def ppm2png( ppm, png )
+	sh "convert #{ppm} -level '#{LEVEL}' -type Grayscale -background white \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
 		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE}\
@@ -64,11 +65,11 @@ def pgm2png( pgm, png )
 end
 
 def png2pdf( png, pdf )
-	sh "sam2p -j:quiet #{png} #{pdf}"
+	sh "sam2p -j:quiet -c:jpeg #{png} #{pdf}"
 end
 
 pages = count_pages
-PGMS = image_list( PGM_DIR, 'pgm', pages )
+PPMS = image_list( PPM_DIR, 'ppm', pages )
 PNGS = image_list( PNG_DIR, 'png', pages )
 PDFS = image_list( PDF_DIR, 'pdf', pages )
 
@@ -77,13 +78,14 @@ PNGS.each_with_index do |png, i|
 		png2pdf( t.prerequisites[1], t.name )
 	end
 
-	file PNGS[i] => [PNG_DIR, PGMS[i]] do |t|
-		pgm2png( t.prerequisites[1], t.name )
+	file PNGS[i] => [PNG_DIR, PPMS[i]] do |t|
+		ppm2png( t.prerequisites[1], t.name )
 	end
 
-	file PGMS[i] => [PGM_DIR, SRC] do
-		unless File::exist?( PGMS[-1] ) then
-			sh "pdftoppm -r 300 -gray #{SRC} #{PGM_DIR}/tmp"
+	file PPMS[i] => [PPM_DIR, SRC] do
+		unless File::exist?( PPMS[-1] ) then
+			#sh "pdftoppm -r 300 -gray #{SRC} #{PPM_DIR}/tmp"
+			sh "pdfimages #{SRC} #{PPM_DIR}/tmp"
 		end
 	end
 end
@@ -105,20 +107,20 @@ file 'metadata.txt' => SRC do |t|
 	sh "pdftk #{t.prerequisites.join ' '} dump_data output ./#{t.name}"
 end
 
-desc 'crop pgm files to png files.'
+desc 'crop ppm files to png files.'
 task :png => [PNG_DIR] + PNGS
 
-rule '.png' => '.pgm' do |t|
-	pgm2png( t.prerequisites[0], t.name )
+rule '.png' => '.ppm' do |t|
+	ppm2png( t.prerequisites[0], t.name )
 end
 
 desc 'extract image files from source pdf.'
-task :pgm => [PGM_DIR, SRC] + PGMS
+task :ppm => [PPM_DIR, SRC] + PPMS
 
-desc 'cleanap pgm images.'
-task 'clean-pgm' do
+desc 'cleanap ppm images.'
+task 'clean-ppm' do
 	begin
-		rm PGMS
+		rm PPMS
 	rescue
 	end
 end
@@ -137,10 +139,10 @@ task 'clean-pdf' do
 end
 
 desc 'cleanap all tmp files.'
-task :clean => ['clean-png', 'clean-pgm', 'clean-pdf'] do
+task :clean => ['clean-png', 'clean-ppm', 'clean-pdf'] do
 	rm 'metadata.txt'
 	rm [HTML, OPF]
-	rmdir PGM_DIR
+	rmdir PPM_DIR
 	rmdir PNG_DIR
 	rmdir PDF_DIR
 end
