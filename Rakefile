@@ -56,7 +56,9 @@ def image_list( dir, ext, count )
 end
 
 def ppm2png( ppm, png )
-	sh "convert #{ppm} -level '#{LEVEL}' -type Grayscale -background white \
+	sh "convert #{ppm} \
+		#{ENV["KINDLIZER_PHASE2_OPT"]} \
+		-level '#{LEVEL}' -type Grayscale -background white \
 		-chop #{LEFT}x#{TOP} \
 		-gravity SouthEast -chop #{RIGHT}x#{BOTTOM}\
 		-gravity NorthWest -fuzz 50% -trim -resize #{SIZE}\
@@ -65,7 +67,7 @@ def ppm2png( ppm, png )
 end
 
 def png2pdf( png, pdf )
-	sh "sam2p -j:quiet -c:jpeg #{png} #{pdf}"
+	sh "sam2p -j:quiet #{ENV['KINDLIZER_PHASE3_OPT']} #{png} #{pdf}"
 end
 
 pages = count_pages
