@@ -11,7 +11,7 @@ Copy Rakefile to your work directory and modify parameters by your environment:
 
 for Debian or Ubuntu user, needs packages below:
 
-*  poppler-utils
+* poppler-utils
 * poppler-data
 * imagemagick
 * pdftk
