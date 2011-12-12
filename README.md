@@ -35,6 +35,13 @@ PDFファイルごとにRakefileをコピーして、以下の値を書き換え
 *  SIZE: Kindleを縦持ち(portrate)にして読むか横持ち(landscape)にして読むか
 *  LEVEL (optional): ImageMagicのlevelオプション。地の紙に色が付いている場合に
 
+以下の環境変数を指定すると、それぞれフェーズ2(ppm→pngを行うconvertコマンド)とフェーズ3(png→pdfを行うsam2pコマンド)にオプションを追加できます:
+
+* KINDLIZER_PHASE2_OPT: convertコマンドへのオプション(推奨は「-depth 4」)
+* KINDLIZER_PHASE3_OPT: sam2pコマンドへのオプション(上記PHASE2で「-depth 4」を指定しない場合に「-c:jpeg」を指定
+
+convertコマンドのいくつかのバージョンでは「-depth 4」がサポートされていないため、標準では採用していませんが、サポートされている場合には非常にコンパクトなPDFファイルを生成できるため、強く推奨します。
+
 ### 実行
 Rakeコマンドに指定できるタスクは以下です:
 
