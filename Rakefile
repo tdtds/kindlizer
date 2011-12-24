@@ -20,6 +20,7 @@ RIGHT = 50
 SIZE = '560x735' # for small books reading portrait style
 #SIZE = '720' # for large books reading landscape style
 #SIZE = 'x693' # for generating mobi, portrait style only
+#SIZE = '600x800' # for generating zip archived png files 
 
 LEVEL = '0%,100%'
 #LEVEL = '0%,80%,0.2' # for grayscale or fullcolor origin.
@@ -34,6 +35,7 @@ DST = SRC.sub( /\.pdf$/, '.out.pdf' )
 MOBI = SRC.sub( /\.pdf$/, '.mobi' )
 OPF = SRC.sub( /\.pdf$/, '.opf' )
 HTML = SRC.sub( /\.pdf$/, '.html' )
+ZIP = SRC.sub( /\.pdf$/, '.zip' )
 
 def count_pages
 	open( "|pdfinfo #{SRC}", 'r:utf-8', &:read ).scan( /^Pages:\s*(\d+)/ ).flatten[0].to_i
@@ -147,6 +149,11 @@ task :clean => ['clean-png', 'clean-ppm', 'clean-pdf'] do
 	rmdir PPM_DIR
 	rmdir PNG_DIR
 	rmdir PDF_DIR
+end
+
+desc 'generate zip file'
+task :zip => PNGS do
+  sh "zip -j #{ZIP} #{PNGS.join ' '}"
 end
 
 desc 'generate MOBI file.'
