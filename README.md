@@ -50,6 +50,7 @@ Rakeコマンドに指定できるタスクは以下です:
 * rake png : 第二工程。第一工程で抽出したPPMファイルをKindle向けPNGファイルに変換します
 * rake pdf : 第三工程。PNGファイルとメタデータを使って変換後のPDFを生成します
 * rake metadata : 元PDFからメタデータを抽出します
+* rake zip : 第二工程までを実行し、PNGファイルをzipアーカイブします。SIZEは600x800にするといいでしょう
 
 最終的に、SRC.out.pdfというファイルができます。Kindleに転送してお読み下さい。ファイル名が書名になります。また、metadata.txtのAuthorを英数字で書き換えると、Kindle上に著者名が(英語で)表示されます。
 
