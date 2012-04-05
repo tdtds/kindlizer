@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Kindlizer : 自炊PDFをKindle3向けにトリミングするRakefile / Cropping white spaces from PDF to adjust for Kindle." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Kindlizer</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/tdtds/kindlizer">Fork Me on GitHub</a>
+
+          <h1 id="project_title">Kindlizer</h1>
+          <h2 id="project_tagline">自炊PDFをKindle3向けにトリミングするRakefile / Cropping white spaces from PDF to adjust for Kindle.</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/tdtds/kindlizer/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/tdtds/kindlizer/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Kindlizer</h1>
+
+<h2>Rakefile for self publishing ebook of Kindle made by scanning paper book.</h2>
+
+<p>Copy Rakefile to your work directory and modify parameters by your environment:</p>
+
+<ul>
+<li> SRC (must): source PDF file name in current directory.</li>
+<li> TOP, BOTTOM, LEFT, RIGHT: default margins (pixel) of trimming.</li>
+<li> SIZE: adjust image size by destination format.</li>
+<li> LEVEL (optional): level option of ImageMagic.</li>
+</ul><p>for Debian or Ubuntu user, needs packages below:</p>
+
+<ul>
+<li>poppler-utils</li>
+<li>poppler-data</li>
+<li>imagemagick</li>
+<li>pdftk</li>
+<li>sam2p</li>
+</ul><hr><h2>自炊したPDFから余白を取り除いてKindle向けに最適化するRakefile</h2>
+
+<p>Kindleで自炊化PDFを読もうとすると、紙面の余白のせいで文字がずいぶんと小さくなります。このRakefileでトリミングすることで、Kindle向けに余白を最小化したPDFファイルを生成しましょう。</p>
+
+<p>ImageMagicの機能を使って余白を自動認識し、ギリギリまで追い込みます。ただし自動で余白として認識されないノンブルなどの余計なものをあらかじめカットしたい場合にはTOP/BOTTOM/LEFT/RIGHTの値をチューニングして下さい。</p>
+
+<p>再作成する画像は6インチ版Kindleの表示エリアに合わせてリサイズされるので、もっとも美しく読める状態になります。</p>
+
+<h3>カスタマイズ</h3>
+
+<p>PDFファイルごとにRakefileをコピーして、以下の値を書き換えて使って下さい:</p>
+
+<ul>
+<li> SRC (必須): 最適化元のPDFファイル</li>
+<li> TOP, BOTTOM, LEFT, RIGHT: あらかじめカットしておく領域(ピクセル)</li>
+<li> SIZE: Kindleを縦持ち(portrate)にして読むか横持ち(landscape)にして読むか</li>
+<li> LEVEL (optional): ImageMagicのlevelオプション。地の紙に色が付いている場合に</li>
+</ul><p>以下の環境変数を指定すると、それぞれフェーズ2(ppm→pngを行うconvertコマンド)とフェーズ3(png→pdfを行うsam2pコマンド)にオプションを追加できます:</p>
+
+<ul>
+<li>KINDLIZER_PHASE2_OPT: convertコマンドへのオプション(推奨は「-depth 4 -deskew 40% -sharpen 5」)</li>
+<li>KINDLIZER_PHASE3_OPT: sam2pコマンドへのオプション(上記PHASE2で「-depth 4」を指定しない場合に「-c:jpeg」を指定</li>
+</ul><p>convertコマンドのいくつかのバージョンでは「-depth 4」がサポートされていないため、標準では採用していませんが、サポートされている場合には非常にコンパクトなPDFファイルを生成できるため、強く推奨します。また、傾き補正のされていないPDFをソースにした場合に、-deskewオプションをつけることでより精度の高いトリミングができるようになるため、これも推奨します。</p>
+
+<h3>実行</h3>
+
+<p>Rakeコマンドに指定できるタスクは以下です:</p>
+
+<ul>
+<li>rake : 全行程を一気に実施し、SRC.out.pdfというファイルを作成します</li>
+<li>rake ppm : 第一工程。PDFから画像の抽出のみ行います</li>
+<li>rake png : 第二工程。第一工程で抽出したPPMファイルをKindle向けPNGファイルに変換します</li>
+<li>rake pdf : 第三工程。PNGファイルとメタデータを使って変換後のPDFを生成します</li>
+<li>rake metadata : 元PDFからメタデータを抽出します</li>
+<li>rake zip : 第二工程までを実行し、PNGファイルをzipアーカイブします。SIZEは600x800にするといいでしょう</li>
+</ul><p>最終的に、SRC.out.pdfというファイルができます。Kindleに転送してお読み下さい。ファイル名が書名になります。また、metadata.txtのAuthorを英数字で書き換えると、Kindle上に著者名が(英語で)表示されます。</p>
+
+<h3>参考</h3>
+
+<p>@kamosawaさんが詳細な解説ドキュメントを書いてくださっています。</p>
+
+<ul>
+<li><a href="http://d.hatena.ne.jp/kamosawa/20111116">kindlizerの使い方</a></li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Kindlizer maintained by <a href="https://github.com/tdtds">tdtds</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
