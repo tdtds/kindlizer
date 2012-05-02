@@ -159,7 +159,10 @@ end
 desc 'cleanap all tmp files.'
 task :clean => ['clean-png', 'clean-ppm', 'clean-pdf'] do
 	rm 'metadata.txt'
-	rm [HTML, OPF]
+	begin
+		rm [HTML, OPF]
+	rescue
+	end
 	rmdir PPM_DIR
 	rmdir PNG_DIR
 	rmdir PDF_DIR
