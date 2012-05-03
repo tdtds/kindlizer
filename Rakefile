@@ -58,7 +58,7 @@ def image_list( dir, ext, count )
 end
 
 def ppm_exist?( ppm )
-	File::exist?( ppm ) || File::exist?( ppm.sub(/ppm$/, 'pgm') ) || File::exist?( ppm.sub(/ppm$/, 'pbm') )
+	File::exist?( ppm ) || File::exist?( ppm.sub(/ppm$/, 'pbm') )
 end
 
 def ppm_file( ppm )
@@ -66,8 +66,6 @@ def ppm_file( ppm )
 		ppm
 	elsif File::exist?( ppm.sub(/ppm$/, 'pbm') )
 		ppm.sub(/ppm$/, 'pbm')
-	elsif File::exist?( ppm.sub(/ppm$/, 'pgm') )
-		ppm.sub(/ppm$/, 'pgm')
 	end
 end
 
@@ -128,7 +126,7 @@ end
 desc 'crop ppm files to png files.'
 task :png => [PNG_DIR] + PNGS
 
-rule '.png' => /\.p[bgp]m$/ do |t|
+rule '.png' => /\.p[bp]m$/ do |t|
 	ppm2png( t.prerequisites[0], t.name )
 end
 
