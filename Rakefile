@@ -57,8 +57,20 @@ def image_list( dir, ext, count )
 	end
 end
 
+def ppm_exist?( ppm )
+	File::exist?( ppm ) || File::exist?( ppm.sub(/ppm$/, 'pbm') )
+end
+
+def ppm_file( ppm )
+	if File::exist?( ppm )
+		ppm
+	elsif File::exist?( ppm.sub(/ppm$/, 'pbm') )
+		ppm.sub(/ppm$/, 'pbm')
+	end
+end
+
 def ppm2png( ppm, png )
-	sh "convert #{ppm} \
+	sh "convert #{ppm_file(ppm)} \
 		#{ENV["KINDLIZER_PHASE2_OPT"]} \
 		-level '#{LEVEL}' -type Grayscale -background white \
 		-chop #{LEFT}x#{TOP} \
@@ -87,7 +99,7 @@ PNGS.each_with_index do |png, i|
 	end
 
 	file PPMS[i] => [PPM_DIR, SRC] do
-		unless File::exist?( PPMS[-1] ) then
+		unless ppm_exist?( PPMS[-1] ) then
 			#sh "pdftoppm -r 300 -gray #{SRC} #{PPM_DIR}/tmp"
 			sh "pdfimages #{SRC} #{PPM_DIR}/tmp"
 		end
@@ -114,7 +126,7 @@ end
 desc 'crop ppm files to png files.'
 task :png => [PNG_DIR] + PNGS
 
-rule '.png' => '.ppm' do |t|
+rule '.png' => /\.p[bp]m$/ do |t|
 	ppm2png( t.prerequisites[0], t.name )
 end
 
@@ -124,7 +136,7 @@ task :ppm => [PPM_DIR, SRC] + PPMS
 desc 'cleanap ppm images.'
 task 'clean-ppm' do
 	begin
-		rm PPMS
+		rm PPMS.collect { |f| ppm_file(f) }
 	rescue
 	end
 end
@@ -145,7 +157,10 @@ end
 desc 'cleanap all tmp files.'
 task :clean => ['clean-png', 'clean-ppm', 'clean-pdf'] do
 	rm 'metadata.txt'
-	rm [HTML, OPF]
+	begin
+		rm [HTML, OPF]
+	rescue
+	end
 	rmdir PPM_DIR
 	rmdir PNG_DIR
 	rmdir PDF_DIR
