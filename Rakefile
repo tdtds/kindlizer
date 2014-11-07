@@ -17,17 +17,20 @@ BOTTOM = 100
 LEFT = 50
 RIGHT = 50
 
-# for Kindle, Kindle Keyboard (display size 600x800)
-SIZE = '560x735' # for small books reading portrait style
-#SIZE = '720' # for large books reading landscape style
-#SIZE = 'x693' # for generating mobi, portrait style only
-#SIZE = '600x800' # for generating zip archived png files 
+# for Kindle Voyage (display size 1080x1440)
+SIZE = '1016x1364' # for small books reading portrait style
 
 # for Kindle Paperwhite (display size 768x1024)
 #SIZE = '658x905' # for small books reading portrait style
 #SIZE = ### UNKNOWN ### # for large books reading landscape style
 #SIZE = ### UNKNOWN ### # for generating mobi, portrait style only
 #SIZE = ### NOT SUPPORTED BY PW ### # for generating zip archived png files 
+
+# for Kindle, Kindle Keyboard (display size 600x800)
+#SIZE = '560x735' # for small books reading portrait style
+#SIZE = '720' # for large books reading landscape style
+#SIZE = 'x693' # for generating mobi, portrait style only
+#SIZE = '600x800' # for generating zip archived png files 
 
 LEVEL = '0%,100%'
 #LEVEL = '0%,80%,0.2' # for grayscale or fullcolor origin.
